@@ -1,10 +1,10 @@
 #include <ESP8266WiFi.h>
-#include "IketsServer.h"
+#include <Socketyee.h>
 
 const char* ssid = "wifi";
 const char* pass = "pass";
 
-IketsServer ws(81);
+Socketyee ws(81);
 
 IPAddress ip(192, 168, 1, 100);
 IPAddress gateway(192, 168, 1, 1);

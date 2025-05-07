@@ -31,14 +31,14 @@ void Socketyee::loop() {
 void Socketyee::handleClient() {
   if (!isWebSocket && client.available()) {
     String req = client.readStringUntil('\r');
-    Serial.println(req);
+    // Serial.println(req);
     if (req.startsWith("GET")) {
       while (client.available()) {
         String line = client.readStringUntil('\r');
         if (line.indexOf("Sec-WebSocket-Key: ") >= 0) {
           String clientKey = line.substring(19);
           clientKey.trim();
-          Serial.println(clientKey);
+          // Serial.println(clientKey);
           String acceptKey = generateAcceptKey(clientKey);
           client.println("HTTP/1.1 101 Switching Protocols");
           client.println("Upgrade: websocket");
@@ -46,14 +46,14 @@ void Socketyee::handleClient() {
           client.print("Sec-WebSocket-Accept: ");
           client.println(acceptKey);
           client.println();
-          Serial.println(acceptKey);
+          // Serial.println(acceptKey);
           isWebSocket = true;
         }
       }
     }
   } else if (isWebSocket && client.available()) {
     uint8_t opcode = client.read();  // 0x81 = text
-    Serial.println(opcode);
+    // Serial.println(opcode);
     uint8_t len = client.read() & 0x7F;
     uint8_t mask[4];
     client.read(mask, 4);
