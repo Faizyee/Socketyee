@@ -1,27 +1,54 @@
+// Socketyee.h
 #ifndef SOCKETYEE_H
 #define SOCKETYEE_H
 
-#include <WiFiClient.h>
-#include <WiFiServer.h>
+#if defined(ESP8266)
+  #include <ESP8266WiFi.h>
+#elif defined(ESP32)
+  #include <WiFi.h>
+#endif
+
 #include <functional>
 
 class Socketyee {
   public:
-    Socketyee(uint16_t port = 81);
-    void begin();
-    void loop();
+    Socketyee();
+
+    void beginServer(uint16_t port);
+
+    void beginClient(const String& host, uint16_t port, const String& path = "/");
+
     void onMessage(std::function<void(String)> callback);
+
+    void loop();
+
     void send(String message);
 
   private:
-    WiFiServer server;
+    enum Mode {
+      SERVER_MODE,
+      CLIENT_MODE
+    } mode = SERVER_MODE;
+
+    WiFiServer server = WiFiServer(81);
     WiFiClient client;
-    std::function<void(String)> onMessageCallback;
+
+    WiFiClient wsClient;
+
     bool isWebSocket = false;
-    
+    bool isClientWebSocket = false;
+
+    std::function<void(String)> onMessageCallback;
+
+    String host;
+    uint16_t port;
+    String path;
+
     void handleClient();
+    void handleClientFrame();
+    void handleServerFrame();
+
     String generateAcceptKey(const String& clientKey);
-    String base64Encode(const uint8_t *data, size_t len);
 };
 
 #endif
